@@ -26,6 +26,20 @@ document.getElementById("abortPairing").addEventListener("click", () => {
 document.getElementById("leavePairing").addEventListener("click", () => {
     peerConnection.sendBye();
 });
+// Add event listener for toggleCamera button
+document.getElementById("toggleCamera").addEventListener("click", () => {
+    const localVideo = document.getElementById("localVideo");
+    const stream = localVideo.srcObject;
+    const videoTrack = stream.getVideoTracks()[0];
+
+    if (videoTrack.enabled) {
+        videoTrack.enabled = false;
+        document.getElementById("toggleCamera").innerText = "Turn on Camera";
+    } else {
+        videoTrack.enabled = true;
+        document.getElementById("toggleCamera").innerText = "Turn off Camera";
+    }
+});
 
 window.addEventListener("beforeunload", () => {
     if (peerConnection.state === "CONNECTED") {
