@@ -27,19 +27,51 @@ document.getElementById("leavePairing").addEventListener("click", () => {
     peerConnection.sendBye();
 });
 // Add event listener for toggleCamera button
-document.getElementById("toggleCamera").addEventListener("click", () => {
-    const localVideo = document.getElementById("localVideo");
-    const stream = localVideo.srcObject;
-    const videoTrack = stream.getVideoTracks()[0];
+// Add event listener for toggleCamera button
+const localVideo = document.getElementById('localVideo');
+const toggleCameraButton = document.getElementById('toggleCamera');
 
-    if (videoTrack.enabled) {
-        videoTrack.enabled = false;
-        document.getElementById("toggleCamera").innerText = "Turn on Camera";
-    } else {
-        videoTrack.enabled = true;
-        document.getElementById("toggleCamera").innerText = "Turn off Camera";
+let stream;
+
+// Function to start the camera
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        localVideo.srcObject = stream;
+    } catch (error) {
+        console.error('Error accessing camera:', error);
     }
+}
+
+// Function to stop the camera
+function stopCamera() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        localVideo.srcObject = null;
+    }
+}
+
+// Variable to track camera state
+let cameraOn = false;
+
+// Event listener for the toggle camera button
+toggleCameraButton.addEventListener('click', () => {
+    if (cameraOn) {
+        stopCamera();
+        toggleCameraButton.textContent = 'Turn Camera On';
+    } else {
+        startCamera();
+        toggleCameraButton.textContent = 'Turn Camera Off';
+    }
+    cameraOn = !cameraOn;
 });
+
+// Start camera when the page loads (optional)
+startCamera();
+cameraOn = true;
+toggleCameraButton.textContent = 'Turn Camera Off';
+
+
 
 window.addEventListener("beforeunload", () => {
     if (peerConnection.state === "CONNECTED") {
